@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- ========================================================= -->
+  <!-- IDENTIDAD DEL PROYECTO                                    -->
+  <!-- ========================================================= -->
+
+  <groupId>io.github.ozra022</groupId>
+  <artifactId>automation-workspace</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <name>Automation Workspace</name>
+
+  <!-- ========================================================= -->
+  <!-- CONFIGURACIÓN                                             -->
+  <!-- ========================================================= -->
+
+  <properties>
+
+    <maven.compiler.release>17</maven.compiler.release>
+
+    <project.build.sourceEncoding>
+      UTF-8
+    </project.build.sourceEncoding>
+
+    <framework.version>1.0-SNAPSHOT</framework.version>
+
+    <testng.version>7.11.0</testng.version>
+
+    <slf4j.version>2.0.16</slf4j.version>
+
+  </properties>
+
+  <!-- ========================================================= -->
+  <!-- REPOSITORIOS                                              -->
+  <!-- ========================================================= -->
+
+  <repositories>
+
+    <!--
+        Repositorio remoto donde se encuentra publicado
+        Automation Framework.
+    -->
+    <repository>
+
+      <id>github</id>
+
+      <name>GitHub Packages - Automation Framework</name>
+
+      <url>
+        https://maven.pkg.github.com/ozra022/automation-framework
+      </url>
+
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+
+      <!--
+          Habilitado porque actualmente utilizamos
+          la versión 1.0-SNAPSHOT del framework.
+      -->
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+
+    </repository>
+
+  </repositories>
+
+  <!-- ========================================================= -->
+  <!-- DEPENDENCIAS                                              -->
+  <!-- ========================================================= -->
+
+  <dependencies>
+
+    <!-- Core común -->
+    <dependency>
+      <groupId>io.github.ozra022</groupId>
+      <artifactId>automation-core</artifactId>
+      <version>${framework.version}</version>
+    </dependency>
+
+    <!-- Automatización Web -->
+    <dependency>
+      <groupId>io.github.ozra022</groupId>
+      <artifactId>selenium-framework</artifactId>
+      <version>${framework.version}</version>
+    </dependency>
+
+    <!-- Automatización Mobile -->
+    <dependency>
+      <groupId>io.github.ozra022</groupId>
+      <artifactId>appium-framework</artifactId>
+      <version>${framework.version}</version>
+    </dependency>
+
+    <!-- Integración automática con TestNG -->
+    <dependency>
+      <groupId>io.github.ozra022</groupId>
+      <artifactId>testng-integration</artifactId>
+      <version>${framework.version}</version>
+    </dependency>
+
+    <!-- TestNG -->
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>${testng.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Logging -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${slf4j.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <!-- ========================================================= -->
+  <!-- EJECUCIÓN DE PRUEBAS                                      -->
+  <!-- ========================================================= -->
+
+  <build>
+
+    <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.5.5</version>
+
+        <configuration>
+
+          <suiteXmlFiles>
+            <suiteXmlFile>testng.xml</suiteXmlFile>
+          </suiteXmlFiles>
+
+        </configuration>
+
+      </plugin>
+
+    </plugins>
+
+  </build>
+</project>
