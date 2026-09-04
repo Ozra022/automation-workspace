@@ -1,19 +1,57 @@
 name: Run Automation Tests
 
+run-name: >
+  Automation #${{ github.run_number }}
+  | Browser: ${{ inputs.browser }}
+  | Headless: ${{ inputs.headless }}
+
 on:
   workflow_dispatch:
+    inputs:
+
+      browser:
+        description: Navegador para ejecutar las pruebas
+        required: true
+        default: chrome
+        type: choice
+        options:
+          - chrome
+          - firefox
+
+      headless:
+        description: Ejecutar navegador sin interfaz gráfica
+        required: true
+        default: true
+        type: boolean
+
 
 permissions:
   contents: read
 
+
 jobs:
+
   test:
+
+    name: Automation Tests
+
     runs-on: ubuntu-latest
+
+    timeout-minutes: 20
 
     steps:
 
-      - name: Descargar repositorio
+      # =========================================================
+      # REPOSITORIO
+      # =========================================================
+
+      - name: Descargar workspace
         uses: actions/checkout@v6
+
+
+      # =========================================================
+      # JAVA / MAVEN
+      # =========================================================
 
       - name: Configurar Java 17 y Maven
         uses: actions/setup-java@v4
@@ -21,20 +59,61 @@ jobs:
           distribution: temurin
           java-version: '17'
           cache: maven
+
+          # Credenciales para consumir Automation Framework
+          # desde GitHub Packages.
           server-id: github
           server-username: MAVEN_USERNAME
           server-password: MAVEN_TOKEN
 
-      - name: Ejecutar pruebas
-        run: mvn --batch-mode -U test -Dautomation.headless=true
+
+      # =========================================================
+      # EJECUCIÓN
+      # =========================================================
+
+      - name: Ejecutar pruebas automatizadas
+        run: >
+          mvn --batch-mode -U test
+          -Dautomation.browser=${{ inputs.browser }}
+          -Dautomation.headless=${{ inputs.headless }}
         env:
-          MAVEN_USERNAME: Ozra022
+          MAVEN_USERNAME: ${{ github.repository_owner }}
           MAVEN_TOKEN: ${{ secrets.MAVEN_TOKEN }}
 
-      - name: Subir evidencias
+
+      # =========================================================
+      # EVIDENCIAS
+      # =========================================================
+
+      - name: Subir evidencias y resultados
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-evidence
-          path: test-evidence/
+          name: automation-results-${{ inputs.browser }}-${{ github.run_number }}
+
+          path: |
+            test-evidence/
+            target/surefire-reports/
+
           if-no-files-found: warn
+          retention-days: 14
+
+
+      # =========================================================
+      # RESUMEN
+      # =========================================================
+
+      - name: Generar resumen de ejecución
+        if: always()
+        shell: bash
+        run: |
+          echo "## 🤖 Automation Test Execution" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Configuración | Valor |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Proyecto | Automation Workspace |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Navegador | ${{ inputs.browser }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Headless | ${{ inputs.headless }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Java | 17 |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Ejecución | #${{ github.run_number }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Rama | ${{ github.ref_name }} |" >> "$GITHUB_STEP_SUMMARY"
